@@ -174,11 +174,9 @@ extension MyCollectionViewController: SuggestionViewDelegate {
     }
 }
 
+// MARK: - UISearchControllerDelegate(實作SearchController起來後的方法)
 extension MyCollectionViewController: UISearchControllerDelegate {
-    // MARK: search被叫起來時，讓result畫面顯示(跳出suggestion)
-    func didPresentSearchController(_ searchController: UISearchController) {
-        searchController.searchResultsController?.view.isHidden = false
-    }
+
 }
 
 extension MyCollectionViewController: UISearchBarDelegate {
@@ -200,13 +198,6 @@ extension MyCollectionViewController: UISearchResultsUpdating {
     // MARK: filter method
     func updateSearchResults(for searchController: UISearchController) {
         
-        // TODO:
-        if #available(iOS 13.0, *) {
-            if searchController.searchBar.searchTextField.isFirstResponder {
-                searchController.showsSearchResultsController = true
-            }
-        }
-        
         // self.searchController.isActive
         // 1 false -> tap suggestion cell or tap done
         // 2 true -> key in filter condition
@@ -218,6 +209,13 @@ extension MyCollectionViewController: UISearchResultsUpdating {
             }
         }
         if self.searchController.isActive {
+            if searchController.searchBar.text?.count ?? 0 == 0 {
+                if #available(iOS 13.0, *) {
+                    searchController.showsSearchResultsController = true
+                } else {
+                    searchController.searchResultsController?.view.isHidden = false
+                }
+            }
             // SearchController已開啟狀態 - suggestion
             if let suggestionsVC = searchController.searchResultsController as? SuggestionViewController {
                 suggestionsVC.showSuggestions(datas: self.getSuggestDatas(sources: sources))
