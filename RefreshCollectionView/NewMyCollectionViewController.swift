@@ -1,14 +1,14 @@
 //
-//  MyCollectionViewController.swift
+//  NewMyCollectionViewController.swift
 //  RefreshCollectionView
 //
-//  Created by i9400506 on 2020/5/22.
+//  Created by 黃宇新 on 2020/7/4.
 //  Copyright © 2020 i9400506. All rights reserved.
 //
 
 import UIKit
 
-class MyCollectionViewController: UIViewController {
+class NewMyCollectionViewController: UIViewController {
     
     private let _cellWidth: CGFloat = {
         return UIScreen.main.bounds.width
@@ -18,23 +18,16 @@ class MyCollectionViewController: UIViewController {
         return UIScreen.main.bounds.height / 6
     }()
     
-    
     @IBOutlet weak var collectionView: UICollectionView!
     
     private var _oneLoading: Bool = false
     private var _twoLoading: Bool = false
     private var _threeLoading: Bool = false
     
-    lazy private var _oneData: [String] = {
-        var result = [String]()
-        for _ in 0..<100 {
-            result.append(self.getElement())
-        }
-        return result
-    }()
+    private var _oneData = [String]()
     lazy private var _twoData: [String] = {
         var result = [String]()
-        for _ in 0..<4 {
+        for _ in 0..<6 {
             result.append(self.getElement())
         }
         return result
@@ -47,21 +40,25 @@ class MyCollectionViewController: UIViewController {
         return result
     }()
     
-    private var _showData = [String]()
-    
     // 若要實作suggestion功能, 請自行實作controller並指定searchResultsController
     // ex: searchController = UISearchController(searchResultsController: somecontroller)
     // 若給nil, 則為預設格式
     private var searchController: UISearchController!
     
-    private var _selected: Selection = .one
+    private var searchBarHeight: CGFloat!
+    
+    private var _selected: Selection = .two
+    
+    private lazy var animator: UIViewPropertyAnimator = {
+        return UIViewPropertyAnimator(duration: 0.1, curve: .easeInOut)
+    }()
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
         
         let collectionViewLayout = self.collectionView.collectionViewLayout as! UICollectionViewFlowLayout
-        if #available(iOS 10.0, *) {            
+        if #available(iOS 10.0, *) {
             collectionViewLayout.itemSize = UICollectionViewFlowLayout.automaticSize
         } else {
             // Fallback on earlier versions
@@ -70,13 +67,14 @@ class MyCollectionViewController: UIViewController {
         
         self.updateTitle()
         
+        self.setupSetting()
+        
         self.setupNavBar()
-        
+
         self.setupSearch()
-        
+
         self.setupRefresh()
-        
-        self.setupShowData(selected: self._selected)
+
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
     }
@@ -87,20 +85,19 @@ class MyCollectionViewController: UIViewController {
         self.setupSearchBarStatus()
     }
     
+    final private func setupSetting() {
+        self.definesPresentationContext = true
+//        self.extendedLayoutIncludesOpaqueBars = true
+    }
+    
     final private func setupNavBar() {
         // 文字自動大小
         self.navigationController?.navigationBar.prefersLargeTitles = true
-//        if #available(iOS 13.0, *) {
-//            let barAppearance =  UINavigationBarAppearance()
-//            barAppearance.configureWithTransparentBackground()
-//            //barAppearance.configureWithDefaultBackground()
-//            //barAppearance.configureWithOpaqueBackground()
-//            self.navigationItem.standardAppearance = barAppearance
-//        }
+        self.navigationItem.hidesSearchBarWhenScrolling = true
     }
     
     final private func getElement() -> String {
-        return "\(Int.random(in: 1...20))"
+        return "\(Int.random(in: 1...100))"
     }
     
     final private func setupSearchBarStatus() {
@@ -128,11 +125,14 @@ class MyCollectionViewController: UIViewController {
 }
 
 // MARK: - SearchController
-extension MyCollectionViewController {
+extension NewMyCollectionViewController {
     final private func setupSearch() {
         let suggestionVC = SuggestionViewController(nibName: "SuggestionViewController", bundle: nil)
         suggestionVC.delegate = self
         self.searchController = UISearchController(searchResultsController: suggestionVC)
+        
+        self.searchBarHeight = self.searchController.searchBar.frame.height
+        
 //        if #available(iOS 13.0, *) {
 //            self.searchController.searchBar.searchTextField.backgroundColor = .green
 //            self.searchController.searchBar.searchTextField.font = UIFont.systemFont(ofSize: 16, weight: .bold)
@@ -158,14 +158,11 @@ extension MyCollectionViewController {
             return type.getTitle()
         }
         
-        self.navigationItem.hidesSearchBarWhenScrolling = true
-        self.definesPresentationContext = true
-        
         self.setupSearchBarStatus()
     }
 }
 
-extension MyCollectionViewController: SuggestionViewDelegate {
+extension NewMyCollectionViewController: SuggestionViewDelegate {
     func didSelect(text: String) {
         // 離開seachbar
         self.searchController.isActive = false
@@ -174,14 +171,11 @@ extension MyCollectionViewController: SuggestionViewDelegate {
     }
 }
 
-extension MyCollectionViewController: UISearchControllerDelegate {
-    // MARK: search被叫起來時，讓result畫面顯示(跳出suggestion)
-    func didPresentSearchController(_ searchController: UISearchController) {
-        searchController.searchResultsController?.view.isHidden = false
-    }
+extension NewMyCollectionViewController :UISearchControllerDelegate {
+    
 }
 
-extension MyCollectionViewController: UISearchBarDelegate {
+extension NewMyCollectionViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         // searchBar按下取消鈕
     }
@@ -196,54 +190,15 @@ extension MyCollectionViewController: UISearchBarDelegate {
     }
 }
 
-extension MyCollectionViewController: UISearchResultsUpdating {
+extension NewMyCollectionViewController: UISearchResultsUpdating {
     // MARK: filter method
     func updateSearchResults(for searchController: UISearchController) {
         
-        // TODO:
-        if #available(iOS 13.0, *) {
-            if searchController.searchBar.searchTextField.isFirstResponder {
-                searchController.showsSearchResultsController = true
-            }
-        }
-        
-        // self.searchController.isActive
-        // 1 false -> tap suggestion cell or tap done
-        // 2 true -> key in filter condition
-        
-        var sources = self.getSourceData(selected: self._selected)
-        if let searchText = searchController.searchBar.text, searchText.count > 0 {
-            sources = sources.filter { (str) -> Bool in
-                str.contains(searchText)
-            }
-        }
-        if self.searchController.isActive {
-            // SearchController已開啟狀態 - suggestion
-            if let suggestionsVC = searchController.searchResultsController as? SuggestionViewController {
-                suggestionsVC.showSuggestions(datas: self.getSuggestDatas(sources: sources))
-            }
-            return
-        }
-        // SearchController已關閉狀態 - 顯示符合條件資料
-        self._showData = sources
-        self.collectionView.reloadSections(IndexSet(integer: 0))
-    }
-    
-    private func getSuggestDatas(sources: [String]) -> [SuggestionCellData] {
-        var countMap = [String: Int]()
-        sources.forEach {
-            countMap[$0, default: 0] += 1
-        }
-        var results = [SuggestionCellData]()
-        for (title, count) in countMap {
-            results.append(SuggestionCellData(title: title, count: count))
-        }
-        return results
     }
 }
 
 // MARK: - UIRefresh
-extension MyCollectionViewController {
+extension NewMyCollectionViewController {
     // MARK: 設定refreshControl
     final private func setupRefresh() {
         guard self.collectionView.refreshControl == nil else {
@@ -264,8 +219,43 @@ extension MyCollectionViewController {
     
     // MARK: 切換分頁
     final private func choiceTab(selected: Selection) {
+        
         self._selected = selected
-        self.setupShowData(selected: selected)
+        self.collectionView.refreshControl?.beginRefreshing()
+        UIView.animate(withDuration: 0.1, animations: {
+            let barHeight = self.navigationController?.navigationBar.frame.height ?? 0
+            self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - barHeight - self.searchBarHeight)
+        }) { (_) in
+            UIView.animate(withDuration: 0.1, animations: {
+                let height = self.collectionView.refreshControl?.bounds.height ?? 0
+                self.collectionView.contentOffset = CGPoint(x: .zero, y: self.collectionView.contentOffset.y - height)
+            }) { (_) in
+                let barHeight = self.navigationController?.navigationBar.frame.height ?? 0
+                self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - barHeight)
+            }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            print("isdone")
+            // 避免正在reload資料但user在scroll而無法完成動畫
+            self.collectionView.isScrollEnabled = false
+            self.collectionView.isScrollEnabled = true
+            self.collectionView.refreshControl?.endRefreshing()
+            self.collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+            UIView.animate(withDuration: 0.1, animations: {
+                self.collectionView.contentOffset = CGPoint(x: .zero, y: self.collectionView.contentOffset.y - 5)
+            }) { (_) in
+                UIView.animate(withDuration: 0.1, animations: {
+                    self.collectionView.contentOffset = CGPoint(x: .zero, y: self.collectionView.contentOffset.y - self.searchBarHeight)
+                }) { (_) in
+                    let barHeight = self.navigationController?.navigationBar.frame.height ?? 0
+                    self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - barHeight)
+                }
+            }
+        }
+        
+        return
+
         if selected == .one {
             self.loadDatas()
             return
@@ -304,28 +294,6 @@ extension MyCollectionViewController {
             }
         }
     }
-    
-    final private func getSourceData(selected: Selection) -> [String] {
-        switch selected {
-        case .one:
-            return self._oneData
-        case .two:
-            return self._twoData
-        case .three:
-            return self._threeData
-        }
-    }
-    
-    final private func setupShowData(selected: Selection) {
-        switch selected {
-        case .one:
-            self._showData = self._oneData
-        case .two:
-            self._showData = self._twoData
-        case .three:
-            self._showData = self._threeData
-        }
-    }
 
     // MARK: refresh control
     @objc final private func refresh() {
@@ -356,7 +324,7 @@ extension MyCollectionViewController {
     // MARK: 下載資料
     final private func downloadDatas(callback: @escaping () -> Void) {
         let selected = self._selected
-        DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 3) {
             var newContents = [String]()
             for _ in 0..<2 {
                 newContents.append(self.getElement())
@@ -369,7 +337,6 @@ extension MyCollectionViewController {
             case .three:
                 self._threeData.append(contentsOf: newContents)
             }
-            self.setupShowData(selected: selected)
             DispatchQueue.main.async {
                 callback()
             }
@@ -398,20 +365,41 @@ extension MyCollectionViewController {
             return self._threeLoading
         }
     }
+
+    final private func getDataCount() -> Int {
+        switch self._selected {
+        case .one:
+            return self._oneData.count
+        case .two:
+            return self._twoData.count
+        case .three:
+            return self._threeData.count
+        }
+    }
 }
 
 // MARK: -  UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
-extension MyCollectionViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+extension NewMyCollectionViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self._showData.count
+        return self.getDataCount()
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RefreshCell", for: indexPath)
+        
         if let refreshCell = cell as? RefreshCell {
-            let value = self._showData[indexPath.row]
+            let value: String
+            switch self._selected {
+            case .one:
+                value = self._oneData[indexPath.row]
+            case .two:
+                value = self._twoData[indexPath.row]
+            case .three:
+                value = self._threeData[indexPath.row]
+            }
             refreshCell.msgLabel.text = "data: [\(value)]"
         }
+        
         return cell
     }
     
@@ -423,23 +411,18 @@ extension MyCollectionViewController: UICollectionViewDataSource, UICollectionVi
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: self._cellWidth, height: self._cellHeight)
     }
-}
-
-// MARK - UIScrollViewDelegate
-extension MyCollectionViewController: UIScrollViewDelegate {
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        
-    }
+    
+    // UICollectionViewDelegate conform UIScrollViewDelegate
     // MARK: scroll時會觸發
     // 用來控制navigationBar是否顯示
     // 一般是hidding效能比較好, 但由於會有動畫(activitiy)在執行, 故改alpha
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let barHeight = self.navigationController?.navigationBar.frame.height ?? 0
-        let nowY = scrollView.contentOffset.y
-        var alpha: CGFloat = (0 - nowY) / barHeight
-        if alpha > 1 {
-            alpha = 1
-        }
-        self.navigationController?.navigationBar.alpha = alpha
+//        let barHeight = self.navigationController?.navigationBar.frame.height ?? 0
+//        let nowY = scrollView.contentOffset.y
+//        var alpha: CGFloat = 1 - nowY / barHeight
+//        if alpha > 1 {
+//            alpha = 1
+//        }
+//        self.navigationController?.navigationBar.alpha = alpha
     }
 }

@@ -8,23 +8,6 @@
 
 import UIKit
 
-enum Selection: Int, CaseIterable {
-    case one = 1
-    case two = 2
-    case three = 3
-    
-    func getTitle() -> String {
-        switch self {
-        case .one:
-            return "Page 1"
-        case .two:
-            return "Page 2"
-        case .three:
-            return "Page 3"
-        }
-    }
-}
-
 class ViewController: UIViewController {
     
     @IBOutlet weak var verLabel: UILabel!

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		47EE16F924B069E50062695F /* NewMain.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 47EE16F824B069E50062695F /* NewMain.storyboard */; };
+		47EE16FB24B06A1C0062695F /* NewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EE16FA24B06A1C0062695F /* NewViewController.swift */; };
+		47EE16FD24B06AEE0062695F /* RefreshCollectionEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EE16FC24B06AEE0062695F /* RefreshCollectionEnums.swift */; };
+		47EE16FF24B075D00062695F /* NewMyCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EE16FE24B075D00062695F /* NewMyCollectionViewController.swift */; };
 		751CB814246BC744002C4545 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751CB813246BC744002C4545 /* AppDelegate.swift */; };
 		751CB816246BC744002C4545 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751CB815246BC744002C4545 /* SceneDelegate.swift */; };
 		751CB818246BC744002C4545 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751CB817246BC744002C4545 /* ViewController.swift */; };
@@ -22,6 +26,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		47EE16F824B069E50062695F /* NewMain.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NewMain.storyboard; sourceTree = "<group>"; };
+		47EE16FA24B06A1C0062695F /* NewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewViewController.swift; sourceTree = "<group>"; };
+		47EE16FC24B06AEE0062695F /* RefreshCollectionEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshCollectionEnums.swift; sourceTree = "<group>"; };
+		47EE16FE24B075D00062695F /* NewMyCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMyCollectionViewController.swift; sourceTree = "<group>"; };
 		751CB810246BC744002C4545 /* RefreshCollectionView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RefreshCollectionView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		751CB813246BC744002C4545 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		751CB815246BC744002C4545 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -49,6 +57,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		47EE16F424B068FB0062695F /* Stroyboard Embed */ = {
+			isa = PBXGroup;
+			children = (
+				47EE16F824B069E50062695F /* NewMain.storyboard */,
+				47EE16FA24B06A1C0062695F /* NewViewController.swift */,
+				47EE16FE24B075D00062695F /* NewMyCollectionViewController.swift */,
+			);
+			name = "Stroyboard Embed";
+			sourceTree = "<group>";
+		};
+		47EE16F524B0696A0062695F /* Manual Add Child */ = {
+			isa = PBXGroup;
+			children = (
+				751CB819246BC744002C4545 /* Main.storyboard */,
+				751CB817246BC744002C4545 /* ViewController.swift */,
+				757B293D2477996E00B781F3 /* MyCollectionViewController.swift */,
+			);
+			name = "Manual Add Child";
+			sourceTree = "<group>";
+		};
 		751CB807246BC744002C4545 = {
 			isa = PBXGroup;
 			children = (
@@ -68,14 +96,14 @@
 		751CB812246BC744002C4545 /* RefreshCollectionView */ = {
 			isa = PBXGroup;
 			children = (
+				751CB81E246BC745002C4545 /* LaunchScreen.storyboard */,
 				751CB813246BC744002C4545 /* AppDelegate.swift */,
 				751CB815246BC744002C4545 /* SceneDelegate.swift */,
-				751CB817246BC744002C4545 /* ViewController.swift */,
-				751CB819246BC744002C4545 /* Main.storyboard */,
+				47EE16FC24B06AEE0062695F /* RefreshCollectionEnums.swift */,
+				47EE16F524B0696A0062695F /* Manual Add Child */,
+				47EE16F424B068FB0062695F /* Stroyboard Embed */,
 				751CB81C246BC745002C4545 /* Assets.xcassets */,
-				751CB81E246BC745002C4545 /* LaunchScreen.storyboard */,
 				751CB821246BC745002C4545 /* Info.plist */,
-				757B293D2477996E00B781F3 /* MyCollectionViewController.swift */,
 				751CB827246BCD80002C4545 /* RefreshCell.swift */,
 				75D800EC249764C500CC9753 /* SuggestionViewController.swift */,
 				75D800EE249768DC00CC9753 /* SuggestionViewController.xib */,
@@ -143,6 +171,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47EE16F924B069E50062695F /* NewMain.storyboard in Resources */,
 				75D800EF249768DC00CC9753 /* SuggestionViewController.xib in Resources */,
 				751CB820246BC745002C4545 /* LaunchScreen.storyboard in Resources */,
 				75D800F12497694300CC9753 /* SuggestionCell.xib in Resources */,
@@ -161,9 +190,12 @@
 				751CB818246BC744002C4545 /* ViewController.swift in Sources */,
 				751CB814246BC744002C4545 /* AppDelegate.swift in Sources */,
 				75D800ED249764C500CC9753 /* SuggestionViewController.swift in Sources */,
+				47EE16FB24B06A1C0062695F /* NewViewController.swift in Sources */,
 				75D800F324976AC300CC9753 /* SuggestionCell.swift in Sources */,
 				751CB816246BC744002C4545 /* SceneDelegate.swift in Sources */,
 				757B293E2477996E00B781F3 /* MyCollectionViewController.swift in Sources */,
+				47EE16FF24B075D00062695F /* NewMyCollectionViewController.swift in Sources */,
+				47EE16FD24B06AEE0062695F /* RefreshCollectionEnums.swift in Sources */,
 				751CB828246BCD80002C4545 /* RefreshCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
