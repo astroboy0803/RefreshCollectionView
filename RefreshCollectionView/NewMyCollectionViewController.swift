@@ -45,7 +45,15 @@ class NewMyCollectionViewController: UIViewController {
     // 若給nil, 則為預設格式
     private var searchController: UISearchController!
     
-    private var searchBarHeight: CGFloat!
+    private var _searchBarHeight: CGFloat = .zero
+    
+    private var _barHeight: CGFloat {
+        return self.navigationController?.navigationBar.frame.height ?? 0
+    }
+    
+    private var _refreshHeight: CGFloat {
+        return self.collectionView.refreshControl?.bounds.height ?? 0
+    }
     
     private var _selected: Selection = .two
     
@@ -87,13 +95,13 @@ class NewMyCollectionViewController: UIViewController {
     
     final private func setupSetting() {
         self.definesPresentationContext = true
-//        self.extendedLayoutIncludesOpaqueBars = true
     }
     
     final private func setupNavBar() {
         // 文字自動大小
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.hidesSearchBarWhenScrolling = true
+        
     }
     
     final private func getElement() -> String {
@@ -131,7 +139,7 @@ extension NewMyCollectionViewController {
         suggestionVC.delegate = self
         self.searchController = UISearchController(searchResultsController: suggestionVC)
         
-        self.searchBarHeight = self.searchController.searchBar.frame.height
+        self._searchBarHeight = self.searchController.searchBar.frame.height
         
 //        if #available(iOS 13.0, *) {
 //            self.searchController.searchBar.searchTextField.backgroundColor = .green
@@ -219,20 +227,12 @@ extension NewMyCollectionViewController {
     
     // MARK: 切換分頁
     final private func choiceTab(selected: Selection) {
-        
         self._selected = selected
         self.collectionView.refreshControl?.beginRefreshing()
         UIView.animate(withDuration: 0.1, animations: {
-            let barHeight = self.navigationController?.navigationBar.frame.height ?? 0
-            self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - barHeight - self.searchBarHeight)
+            self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - self._barHeight - self._searchBarHeight - self._refreshHeight - 200)
         }) { (_) in
-            UIView.animate(withDuration: 0.1, animations: {
-                let height = self.collectionView.refreshControl?.bounds.height ?? 0
-                self.collectionView.contentOffset = CGPoint(x: .zero, y: self.collectionView.contentOffset.y - height)
-            }) { (_) in
-                let barHeight = self.navigationController?.navigationBar.frame.height ?? 0
-                self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - barHeight)
-            }
+            self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - self._barHeight)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -241,16 +241,11 @@ extension NewMyCollectionViewController {
             self.collectionView.isScrollEnabled = false
             self.collectionView.isScrollEnabled = true
             self.collectionView.refreshControl?.endRefreshing()
-            self.collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+            let offsetY = 0 - self._barHeight - self._searchBarHeight - 200
             UIView.animate(withDuration: 0.1, animations: {
-                self.collectionView.contentOffset = CGPoint(x: .zero, y: self.collectionView.contentOffset.y - 5)
-            }) { (_) in
-                UIView.animate(withDuration: 0.1, animations: {
-                    self.collectionView.contentOffset = CGPoint(x: .zero, y: self.collectionView.contentOffset.y - self.searchBarHeight)
-                }) { (_) in
-                    let barHeight = self.navigationController?.navigationBar.frame.height ?? 0
-                    self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - barHeight)
-                }
+                self.collectionView.contentOffset = CGPoint(x: .zero, y: offsetY)
+            }) { (isDone) in
+                self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - self._barHeight)
             }
         }
         
