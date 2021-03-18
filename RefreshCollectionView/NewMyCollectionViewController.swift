@@ -85,12 +85,55 @@ class NewMyCollectionViewController: UIViewController {
 
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(becomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(resignActive), name: UIApplication.willResignActiveNotification, object: nil)
+    }
+    
+    // MARK: 背景回前景
+    @objc
+    private final func resignActive() {
+        guard let refreshControl = self.collectionView.refreshControl else {
+            return
+        }
+        //refreshControl.endRefreshing()
+    }
+    
+    
+    // MARK: 背景回前景
+    @objc
+    private final func becomeActive() {
+        guard let refreshControl = self.collectionView.refreshControl else {
+            return
+        }
+                
+//        refreshControl.beginRefreshing()
+//        UIView.animate(withDuration: 0.1, animations: {
+//            self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - self._barHeight - self._searchBarHeight - self._refreshHeight - 200)
+//        }) { (_) in
+//            self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - self._barHeight)
+//        }
     }
     
     final func changeTab(selected: Selection) {
-        self.choiceTab(selected: selected)
-        self.updateTitle()
-        self.setupSearchBarStatus()
+        
+        self.collectionView.refreshControl?.beginRefreshing()
+        UIView.animate(withDuration: 0.1, animations: {
+            self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - self._barHeight - self._searchBarHeight - self._refreshHeight - 200)
+        }) { (_) in
+            self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - self._barHeight)
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.collectionView.refreshControl?.endRefreshing()
+        }
+        
+        return
+//
+//        self.choiceTab(selected: selected)
+//        self.updateTitle()
+//        self.setupSearchBarStatus()
     }
     
     final private func setupSetting() {
@@ -130,6 +173,10 @@ class NewMyCollectionViewController: UIViewController {
         //self.searchController.searchBar.isUserInteractionEnabled = canSearch
         //self.searchController.searchBar.isHidden = !canSearch
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
 }
 
 // MARK: - SearchController
@@ -140,20 +187,24 @@ extension NewMyCollectionViewController {
         self.searchController = UISearchController(searchResultsController: suggestionVC)
         
         self._searchBarHeight = self.searchController.searchBar.frame.height
-        
+
 //        if #available(iOS 13.0, *) {
 //            self.searchController.searchBar.searchTextField.backgroundColor = .green
 //            self.searchController.searchBar.searchTextField.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-//            self.searchController.searchBar.searchTextField.placeholder = "keyword"
 //        } else {
-//            // Fallback on earlier versions
 //        }
+        
+        // 更新cancel文字
+        let cancelItem = UIBarButtonItem.appearance(whenContainedInInstancesOf: [UISearchBar.self])
+        cancelItem.title = "取消"
+
         self.searchController.delegate = self
         self.searchController.searchResultsUpdater = self
         
         self.searchController.searchBar.delegate = self
         self.searchController.searchBar.autocorrectionType = .no
         self.searchController.searchBar.placeholder = "請輸入搜尋內容"
+        
         // 避免插入貼上前後出現空白
         self.searchController.searchBar.smartInsertDeleteType = .no
         
@@ -213,10 +264,13 @@ extension NewMyCollectionViewController {
             return
         }
         
-        let refreshControl = UIRefreshControl()
-        // 設定狀態
-        refreshControl.attributedTitle = NSAttributedString(string: "資料更新中")
-        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+//        let refreshControl = UIRefreshControl()
+//        // 設定狀態
+//        refreshControl.attributedTitle = NSAttributedString(string: "資料更新中")
+//        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        
+        let refreshControl = TabRefreshControl()
+        
         self.collectionView.refreshControl = refreshControl
     }
     

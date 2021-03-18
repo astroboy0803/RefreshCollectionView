@@ -19,6 +19,7 @@
 		751CB820246BC745002C4545 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 751CB81E246BC745002C4545 /* LaunchScreen.storyboard */; };
 		751CB828246BCD80002C4545 /* RefreshCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751CB827246BCD80002C4545 /* RefreshCell.swift */; };
 		757B293E2477996E00B781F3 /* MyCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 757B293D2477996E00B781F3 /* MyCollectionViewController.swift */; };
+		75D02DA526034B33002EAF66 /* TabRefreshControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D02DA426034B33002EAF66 /* TabRefreshControl.swift */; };
 		75D800ED249764C500CC9753 /* SuggestionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D800EC249764C500CC9753 /* SuggestionViewController.swift */; };
 		75D800EF249768DC00CC9753 /* SuggestionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 75D800EE249768DC00CC9753 /* SuggestionViewController.xib */; };
 		75D800F12497694300CC9753 /* SuggestionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 75D800F02497694300CC9753 /* SuggestionCell.xib */; };
@@ -40,6 +41,7 @@
 		751CB821246BC745002C4545 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		751CB827246BCD80002C4545 /* RefreshCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshCell.swift; sourceTree = "<group>"; };
 		757B293D2477996E00B781F3 /* MyCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyCollectionViewController.swift; sourceTree = "<group>"; };
+		75D02DA426034B33002EAF66 /* TabRefreshControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabRefreshControl.swift; sourceTree = "<group>"; };
 		75D800EC249764C500CC9753 /* SuggestionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionViewController.swift; sourceTree = "<group>"; };
 		75D800EE249768DC00CC9753 /* SuggestionViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SuggestionViewController.xib; sourceTree = "<group>"; };
 		75D800F02497694300CC9753 /* SuggestionCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SuggestionCell.xib; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 				75D800EE249768DC00CC9753 /* SuggestionViewController.xib */,
 				75D800F224976AC300CC9753 /* SuggestionCell.swift */,
 				75D800F02497694300CC9753 /* SuggestionCell.xib */,
+				75D02DA426034B33002EAF66 /* TabRefreshControl.swift */,
 			);
 			path = RefreshCollectionView;
 			sourceTree = "<group>";
@@ -188,6 +191,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				751CB818246BC744002C4545 /* ViewController.swift in Sources */,
+				75D02DA526034B33002EAF66 /* TabRefreshControl.swift in Sources */,
 				751CB814246BC744002C4545 /* AppDelegate.swift in Sources */,
 				75D800ED249764C500CC9753 /* SuggestionViewController.swift in Sources */,
 				47EE16FB24B06A1C0062695F /* NewViewController.swift in Sources */,
@@ -353,7 +357,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
@@ -374,7 +378,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
 		};
