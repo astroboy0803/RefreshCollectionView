@@ -118,6 +118,10 @@ class NewMyCollectionViewController: UIViewController {
     
     final func changeTab(selected: Selection) {
         
+        if let tabRefresh = self.collectionView.refreshControl as? TabRefreshControl {
+            tabRefresh.updateTitle(title: "我們來試試看更新吧")
+        }
+        
         self.collectionView.refreshControl?.beginRefreshing()
         UIView.animate(withDuration: 0.1, animations: {
             self.collectionView.contentOffset = CGPoint(x: .zero, y: 0 - self._barHeight - self._searchBarHeight - self._refreshHeight - 200)
@@ -267,9 +271,9 @@ extension NewMyCollectionViewController {
 //        let refreshControl = UIRefreshControl()
 //        // 設定狀態
 //        refreshControl.attributedTitle = NSAttributedString(string: "資料更新中")
-//        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
         
         let refreshControl = TabRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
         
         self.collectionView.refreshControl = refreshControl
     }
@@ -304,49 +308,50 @@ extension NewMyCollectionViewController {
         }
         
         return
-
-        if selected == .one {
-            self.loadDatas()
-            return
-        }
-
-        // 載入資料(舊)
-        self.loadDatas { (_) in
-            self.collectionView.refreshControl?.beginRefreshing()
-            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
-                // 開啟 refresh control
-                let height: CGFloat = self.collectionView.refreshControl?.bounds.height ?? 0
-                if let barFrame = self.navigationController?.navigationBar.frame {
-                    self.navigationController?.navigationBar.frame = CGRect(origin: barFrame.origin, size: CGSize(width: barFrame.width, height: barFrame.height + height))
-                } else {
-                    self.collectionView.contentOffset = CGPoint(x: 0, y: 0 - height)
-                }
-                
-            }) { (_) in
-                guard !self.getLoading(selected: selected) else {
-                    // TODO: test
-                    print("\(selected) is loading")
-                    return
-                }
-                self.setupLoading(selected: selected, isLoading: true)
-                self.downloadDatas {
-                    self.setupLoading(selected: selected, isLoading: false)
-                    print("\(selected) is done")
-                    if selected == self._selected {
-                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
-                            self.collectionView.refreshControl?.endRefreshing()
-                        }) { (_) in
-                            self.loadDatas()
-                        }
-                    }
-                }
-            }
-        }
+//
+//        if selected == .one {
+//            self.loadDatas()
+//            return
+//        }
+//
+//        // 載入資料(舊)
+//        self.loadDatas { (_) in
+//            self.collectionView.refreshControl?.beginRefreshing()
+//            UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
+//                // 開啟 refresh control
+//                let height: CGFloat = self.collectionView.refreshControl?.bounds.height ?? 0
+//                if let barFrame = self.navigationController?.navigationBar.frame {
+//                    self.navigationController?.navigationBar.frame = CGRect(origin: barFrame.origin, size: CGSize(width: barFrame.width, height: barFrame.height + height))
+//                } else {
+//                    self.collectionView.contentOffset = CGPoint(x: 0, y: 0 - height)
+//                }
+//
+//            }) { (_) in
+//                guard !self.getLoading(selected: selected) else {
+//                    // TODO: test
+//                    print("\(selected) is loading")
+//                    return
+//                }
+//                self.setupLoading(selected: selected, isLoading: true)
+//                self.downloadDatas {
+//                    self.setupLoading(selected: selected, isLoading: false)
+//                    print("\(selected) is done")
+//                    if selected == self._selected {
+//                        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
+//                            self.collectionView.refreshControl?.endRefreshing()
+//                        }) { (_) in
+//                            self.loadDatas()
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     // MARK: refresh control
     @objc final private func refresh() {
         let selected = self._selected
+        self.collectionView.refreshControl?.beginRefreshing()
         self.downloadDatas { [weak self] in
             guard let self = self else {
                 return

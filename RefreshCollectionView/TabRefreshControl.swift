@@ -24,10 +24,6 @@ internal final class TabRefreshControl: UIRefreshControl {
         return actView
     }()
     
-    private lazy var animator: UIViewPropertyAnimator = {
-        return UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut)
-    }()
-    
     override init() {
         super.init()
         self.setup()
@@ -39,11 +35,8 @@ internal final class TabRefreshControl: UIRefreshControl {
     }
     
     private final func setup() {
-        self.backgroundColor = .clear
-        self.tintColor = .clear
-        self.subviews.forEach({ $0.removeFromSuperview() })
+        self.removeNativeSubviews()
         self.createCustomUI()
-        self.setupAnimation()
     }
     
     private final func createCustomUI() {
@@ -53,7 +46,7 @@ internal final class TabRefreshControl: UIRefreshControl {
         self.addSubview(self.titleLabel)
         
         for _ in 0..<3 {
-            let label = self.getLabel()
+            let label = self.getLabel(size: 28)
             label.text = "."
             self.pointlabels.append(label)
             self.addSubview(label)
@@ -65,7 +58,7 @@ internal final class TabRefreshControl: UIRefreshControl {
             self.activity.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             self.activity.bottomAnchor.constraint(equalTo: self.titleLabel.topAnchor, constant: -5),
             self.pointlabels[0].centerYAnchor.constraint(equalTo: self.titleLabel.centerYAnchor),
-            self.pointlabels[0].leadingAnchor.constraint(equalTo: self.titleLabel.trailingAnchor, constant: 5),
+            self.pointlabels[0].leadingAnchor.constraint(equalTo: self.titleLabel.trailingAnchor, constant: 10),
             self.pointlabels[0].widthAnchor.constraint(equalToConstant: 10),
             
             self.pointlabels[1].centerYAnchor.constraint(equalTo: self.pointlabels[0].centerYAnchor),
@@ -78,32 +71,66 @@ internal final class TabRefreshControl: UIRefreshControl {
         ])
     }
     
-    private final func setupAnimation() {
-        for row in pointlabels.enumerated() {
-            animator.addAnimations({
-                row.element.transform = CGAffineTransform(rotationAngle: CGFloat(Float.pi/4))
-            }, delayFactor: CGFloat(row.offset) * 1)
-            animator.addAnimations({
-                row.element.transform = CGAffineTransform(rotationAngle: CGFloat(Float.pi/4))
-            }, delayFactor: CGFloat(row.offset + 1) * 1.5)
-        }
-    }
-    
-    private final func getLabel() -> UILabel {
+    private final func getLabel(size: CGFloat = 20) -> UILabel {
         let label = UILabel()
         label.tintColor = .black
-        label.font = .systemFont(ofSize: 20)
+        label.font = .systemFont(ofSize: size)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }
     
     override func beginRefreshing() {
         super.beginRefreshing()
-        self.animator.startAnimation()
+        self.removeNativeSubviews()
+        self.startAnimation()
     }
     
     override func endRefreshing() {
-        self.animator.stopAnimation(true)
         super.endRefreshing()
+        self.stopAnimation()
+    }
+    
+    public final func updateTitle(title: String) {
+        self.titleLabel.text = title
+    }
+    
+    private final func removeNativeSubviews() {
+        self.backgroundColor = .clear
+        self.tintColor = .clear
+        for subview in self.subviews {
+            if subview === self.activity {
+                continue
+            }
+            if subview === self.titleLabel {
+                continue
+            }
+            if self.pointlabels.contains(where: { $0 === subview }) {
+                continue
+            }
+            subview.removeFromSuperview()
+        }
+    }
+    
+    private final func startAnimation() {
+        
+        let labelCount: Double = .init(self.pointlabels.count)
+        let duration: Double = 0.2 * labelCount
+        let keyConstant: Double = duration / labelCount
+        UIView.animateKeyframes(withDuration: duration + keyConstant, delay: 0, options: [.repeat, .autoreverse]) {
+            for row in self.pointlabels.enumerated() {
+                let cgIdx = Double(row.offset)
+                UIView.addKeyframe(withRelativeStartTime: cgIdx * keyConstant, relativeDuration: (cgIdx + 1) * keyConstant) {
+                    row.element.transform = CGAffineTransform(rotationAngle: CGFloat(Float.pi/4))
+                }
+            }
+        } completion: { (_) in
+        }
+    }
+    
+    private final func stopAnimation() {
+        self.pointlabels.forEach({
+            $0.transform = .identity
+            $0.layer.removeAllAnimations()
+        })
     }
 }
