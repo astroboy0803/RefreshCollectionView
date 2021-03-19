@@ -47,7 +47,6 @@ internal final class TabRefreshControl: UIRefreshControl {
         
         for _ in 0..<3 {
             let label = self.getLabel(size: 28)
-            label.text = "."
             self.pointlabels.append(label)
             self.addSubview(label)
         }
@@ -116,11 +115,12 @@ internal final class TabRefreshControl: UIRefreshControl {
         let labelCount: Double = .init(self.pointlabels.count)
         let duration: Double = 0.2 * labelCount
         let keyConstant: Double = duration / labelCount
-        UIView.animateKeyframes(withDuration: duration + keyConstant, delay: 0, options: [.repeat, .autoreverse]) {
+        UIView.animateKeyframes(withDuration: duration + keyConstant, delay: 0, options: [.repeat]) {
             for row in self.pointlabels.enumerated() {
+                row.element.text = "."
                 let cgIdx = Double(row.offset)
                 UIView.addKeyframe(withRelativeStartTime: cgIdx * keyConstant, relativeDuration: (cgIdx + 1) * keyConstant) {
-                    row.element.transform = CGAffineTransform(rotationAngle: CGFloat(Float.pi/4))
+                    row.element.transform = CGAffineTransform(rotationAngle: 0 - CGFloat(Float.pi/4))
                 }
             }
         } completion: { (_) in
@@ -129,6 +129,7 @@ internal final class TabRefreshControl: UIRefreshControl {
     
     private final func stopAnimation() {
         self.pointlabels.forEach({
+            $0.text = ""
             $0.transform = .identity
             $0.layer.removeAllAnimations()
         })
